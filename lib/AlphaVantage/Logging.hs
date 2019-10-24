@@ -50,7 +50,7 @@ stdoutLoggingExec = runDefaultLogExecWithContext
 -- | A Katip Log environment which targets stdout
 stdoutLoggingContext :: LogContext -> IO LogContext
 stdoutLoggingContext cxt = do
-    handleScribe <- LG.mkHandleScribe LG.ColorIfTerminal IO.stdout LG.InfoS LG.V2
+    handleScribe <- LG.mkHandleScribe LG.ColorIfTerminal IO.stdout (LG.permitItem LG.InfoS) LG.V2
     LG.registerScribe "stdout" handleScribe LG.defaultScribeSettings cxt
 
 -- * stderr logger
@@ -62,7 +62,7 @@ stderrLoggingExec = runDefaultLogExecWithContext
 -- | A Katip Log environment which targets stderr
 stderrLoggingContext :: LogContext -> IO LogContext
 stderrLoggingContext cxt = do
-    handleScribe <- LG.mkHandleScribe LG.ColorIfTerminal IO.stderr LG.InfoS LG.V2
+    handleScribe <- LG.mkHandleScribe LG.ColorIfTerminal IO.stderr (LG.permitItem LG.InfoS) LG.V2
     LG.registerScribe "stderr" handleScribe LG.defaultScribeSettings cxt
 
 -- * Null logger
