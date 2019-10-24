@@ -5,6 +5,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module AlphaVantage.Model where
@@ -24,6 +25,9 @@ import Data.Csv
 import qualified Control.Monad.Fail as Fail
 import qualified Data.Vector as V
 
+import GHC.Generics
+import Data.Aeson.Types (ToJSON)
+
 -- * Parameter newtypes
 
 -- ** Symbol
@@ -34,7 +38,8 @@ newtype Symbol = Symbol { unSymbol :: Text } deriving (P.Eq, P.Show)
 data TimeSeries a = TimeSeries
   {
     timeSeriesData :: !(V.Vector (TI.UTCTime, a))
-  } deriving (P.Show, P.Eq, P.Typeable)
+  } deriving (P.Show, P.Eq, P.Typeable, Generic)
+
 
 data MarketData = MarketData
   {
@@ -43,9 +48,10 @@ data MarketData = MarketData
    , marketDataLow :: !P.Double -- ^ /Required/ "Time Series"
    , marketDataClose :: !P.Double -- ^ /Required/ "Time Series"
    , marketDataVolume :: !P.Double -- ^ /Required/ "Time Series"
-  } deriving (P.Show, P.Eq, P.Typeable)
+  } deriving (P.Show, P.Eq, P.Typeable, Generic)
 
 
+instance ToJSON MarketData
 
 instance FromField TI.UTCTime where
   parseField s = case parseDate $ BC.unpack s of
@@ -65,10 +71,10 @@ instance FromNamedRecord (TI.UTCTime, MarketData) where
           )
 
 
-instance ResponseParser (TimeSeries MarketData) where 
+instance ResponseParser (TimeSeries MarketData) where
   parseResponse res = case decodeByName res of
     P.Left err ->  P.Left err
-    P.Right (_, v) -> P.Right $  TimeSeries v        
+    P.Right (_, v) -> P.Right $  TimeSeries v
 
 
 data Outputsize
