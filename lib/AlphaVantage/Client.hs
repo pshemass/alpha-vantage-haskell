@@ -7,7 +7,8 @@
 {-# LANGUAGE DeriveTraversable #-}
 
 module AlphaVantage.Client (
-  dispatchRequest
+  dispatchRequest,
+  MimeError(..)
   ) where
 
 import AlphaVantage.Core
@@ -123,7 +124,7 @@ _toInitRequest
 _toInitRequest config req0  =
   runConfigLogWithExceptions "Client" config $ do
     parsedReq <- P.liftIO $ NH.parseRequest $ BCL.unpack $ BCL.append (configHost config) (BCL.concat (rUrlPath req0))
-    let req1 = req0 
+    let req1 = req0
                `setQuery` toQuery ("datatype", Just ("csv" :: T.Text))
                `setQuery` toQuery ("apikey", Just $ unApikey $ configApiKey $ config)
         reqHeaders = ("User-Agent", WH.toHeader (T.pack "alpha-vantage-hs")) : paramsHeaders (rParams req1)
